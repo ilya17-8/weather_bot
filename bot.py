@@ -14,7 +14,7 @@ dp = Dispatcher()
 
 @dp.message(Command("старт"))
 async def start(message: types.Message):
-    await message.answer("Привет! Я погодный бот.\n\n/город (название) - установить город")
+    await message.answer("Привет! Я погодный бот.\n\n/город (название) - установить город\n/погода - узнать погоду")
 
 @dp.message(Command("помощь"))
 async def help(message: types.Message):
@@ -32,7 +32,12 @@ async def set_city(message: types.Message):
 
 @dp.message(Command("погода"))
 async def get_weather(message: types.Message):
-    city = user_cities.get(message.from_user.id, "Severodvinsk")
+    # Проверяем, установил ли пользователь город
+    if message.from_user.id not in user_cities:
+        await message.answer("❌ Сначала установи город командой /город (название)")
+        return
+    
+    city = user_cities[message.from_user.id]
     
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER_API_KEY}&units=metric&lang=ru"
     
@@ -41,11 +46,12 @@ async def get_weather(message: types.Message):
             async with session.get(url, timeout=10) as response:
                 if response.status == 200:
                     data = await response.json()
-                    temp = data["main"]["temp"]
-                    feels_like = data["main"]["feels_like"]
-                    description = data["weather"][0]["description"]
-                    humidity = data["main"]["humidity"]
-                    wind = data["main"]["wind"]["speed"]
+                    
+                    temp = data.get("main", {}).get("temp", "?")
+                    feels_like = data.get("main", {}).get("feels_like", "?")
+                    description = data.get("weather", [{}])[0].get("description", "неизвестно")
+                    humidity = data.get("main", {}).get("humidity", "?")
+                    wind = data.get("wind", {}).get("speed", "?")
                     
                     answer = (f"🌍 Погода в {city}:\n\n"
                               f"🌡 {temp}°C (ощущается как {feels_like}°C)\n"
