@@ -87,8 +87,30 @@ async def get_weather(message: types.Message):
         except Exception as e:
             await message.answer(f"❌ Ошибка при получении погоды: {str(e)}")
 
+from aiohttp import web
+import os
+
+async def health(request):
+    return web.Response(text="OK")
+
+async def run_web():
+    app = web.Application()
+    app.router.add_get('/', health)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    print(f"Web server started on port {port}")
+    # Бесконечно ждем, чтобы сервер не закрывался
+    await asyncio.Event().wait()
+
 async def main():
-    await dp.start_polling(bot)
+    # Запускаем бота и веб-сервер одновременно
+    await asyncio.gather(
+        dp.start_polling(bot),
+        run_web()
+    )
 
 if __name__ == "__main__":
     asyncio.run(main())
