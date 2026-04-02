@@ -13,6 +13,11 @@ user_cities = {}
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+# Обработчик для английской команды /start (Telegram отправляет её автоматически)
+@dp.message(Command("start"))
+async def start_en(message: types.Message):
+    await message.answer("Привет! Я погодный бот.\n\n/город (название) - установить город")
+
 @dp.message(Command("старт"))
 async def start(message: types.Message):
     await message.answer("Привет! Я погодный бот.\n\n/город (название) - установить город")
