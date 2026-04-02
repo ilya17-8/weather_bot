@@ -99,7 +99,7 @@ async def get_horoscope(message: types.Message):
         await message.answer("❌ Сначала установи знак зодиака командой /зодиак (название)\nПример: /зодиак рак")
         return
     
-    zodiac = user_zodiac[message.from_user.id]
+    zodiac = user_zodiac[message.from_user.id].lower()  # приводим к нижнему регистру
     
     url = f"https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign={zodiac}&day=today"
     
