@@ -31,7 +31,7 @@ async def help(message: types.Message):
 async def set_city(message: types.Message):
     parts = message.text.split()
     if len(parts) > 1:
-        city = parts[1:]
+        city_list = parts[1:]
         city = " ".join(city_list) 
         user_cities[message.from_user.id] = city
         await message.answer(f"✅ Город установлен: {city}\nНапиши /погода, чтобы узнать погоду")
