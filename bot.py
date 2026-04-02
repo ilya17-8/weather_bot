@@ -17,11 +17,11 @@ dp = Dispatcher()
 # Обработчик для английской команды /start (Telegram отправляет её автоматически)
 @dp.message(Command("start"))
 async def start_en(message: types.Message):
-    await message.answer("Привет! Я погодный бот.\n\n Напиши /помощь, чтобы узнать что я умею")
+    await message.answer("Привет! Я погодный бот.\n\nНапиши /помощь, чтобы узнать что я умею")
 
 @dp.message(Command("старт"))
 async def start(message: types.Message):
-    await message.answer("Привет, я твой новый помощник.\n\n Напиши /помощь, чтобы узнать что я умею")
+    await message.answer("Привет, я твой новый помощник.\n\nНапиши /помощь, чтобы узнать что я умею")
 
 @dp.message(Command("помощь"))
 async def help(message: types.Message):
@@ -87,9 +87,9 @@ async def get_weather(message: types.Message):
 async def set_zodiac(message: types.Message):
     parts = message.text.split()
     if len(parts) > 1:
-        zodiac = parts[1].lower()
+        zodiac = parts[1]
         user_zodiac[message.from_user.id] = zodiac
-        await message.answer(f"✅ Знак зодиака установлен: {zodiac.capitalize()}\nНапиши /гороскоп, чтобы узнать гороскоп")
+        await message.answer(f"✅ Знак зодиака установлен: {zodiac}\nНапиши /гороскоп, чтобы узнать гороскоп")
     else:
         await message.answer("❌ Пример: /зодиак рак")
 
