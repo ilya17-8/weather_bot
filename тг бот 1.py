@@ -13,6 +13,7 @@ dp = Dispatcher()
 @dp.message(Command("start"))
 async def start(message: types.Message):
     await message.answer("Привет, я твой новый помощник! Напиши свой город после /setcity")
+
 @dp.message(Command("setcity"))
 async def setcity(message: types.Message):
     global CITY
