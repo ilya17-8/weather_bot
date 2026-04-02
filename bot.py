@@ -14,11 +14,11 @@ dp = Dispatcher()
 
 @dp.message(Command("старт"))
 async def start(message: types.Message):
-    await message.answer("Привет! Я погодный бот.\n\n/город <название> - установить город\n/погода - узнать погоду")
+    await message.answer("Привет! Я погодный бот.\n\n/город (название) - установить город")
 
 @dp.message(Command("помощь"))
 async def help(message: types.Message):
-    await message.answer("Команды:\n/старт - приветствие\n/город <город> - установить город\n/погода - показать погоду")
+    await message.answer("Команды:\n/старт - приветствие\n/город (название) - установить город\n/погода - показать погоду")
 
 @dp.message(Command("город"))
 async def set_city(message: types.Message):
