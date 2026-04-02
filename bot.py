@@ -17,7 +17,7 @@ dp = Dispatcher()
 # Обработчик для английской команды /start (Telegram отправляет её автоматически)
 @dp.message(Command("start"))
 async def start_en(message: types.Message):
-    await message.answer("Привет! Я погодный бот.\n\nНапиши /помощь, чтобы узнать что я умею")
+    await message.answer("Привет, я твой новый помощник!\n\nНапиши /помощь, чтобы узнать что я умею")
 
 @dp.message(Command("старт"))
 async def start(message: types.Message):
@@ -32,6 +32,7 @@ async def set_city(message: types.Message):
     parts = message.text.split()
     if len(parts) > 1:
         city = parts[1:]
+        city = " ".join(city_list) 
         user_cities[message.from_user.id] = city
         await message.answer(f"✅ Город установлен: {city}\nНапиши /погода, чтобы узнать погоду")
     else:
