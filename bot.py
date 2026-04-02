@@ -27,7 +27,7 @@ async def set_city(message: types.Message):
     if len(parts) > 1:
         city = parts[1]
         user_cities[message.from_user.id] = city
-        await message.answer(f"✅ Город установлен: {city}\n Напишите /погода, чтобы узнать погоду на данный момент")
+        await message.answer(f"✅ Город установлен: {city}\n Напиши /погода, чтобы узнать погоду на данный момент")
     else:
         await message.answer("❌ Пример: /город Москва")
 
