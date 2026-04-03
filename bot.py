@@ -123,7 +123,7 @@ async def get_horoscope(message: types.Message):
     
     zodiac_en = zodiac_translate[zodiac_ru]
     
-    # СТАБИЛЬНЫЙ API гороскопа
+    # РАБОЧИЙ API гороскопа
     url = f"https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign={zodiac_en}&day=today"
     
     async with aiohttp.ClientSession() as session:
@@ -132,15 +132,13 @@ async def get_horoscope(message: types.Message):
                 if response.status == 200:
                     data = await response.json()
                     
-                    # Получаем текст гороскопа из ответа
+                    # Получаем текст гороскопа
                     if "data" in data and "horoscope" in data["data"]:
                         horoscope_en = data["data"]["horoscope"]
-                    elif "horoscope" in data:
-                        horoscope_en = data["horoscope"]
                     else:
-                        horoscope_en = str(data)
+                        horoscope_en = "Не удалось получить гороскоп"
                     
-                    # Перевод на русский через Google Translate
+                    # Перевод на русский
                     try:
                         translate_url = "https://translate.googleapis.com/translate_a/single"
                         params = {
@@ -161,9 +159,9 @@ async def get_horoscope(message: types.Message):
                     
                     await message.answer(f"🔮 Гороскоп для {zodiac_ru.capitalize()} на сегодня:\n\n{horoscope_text}")
                 else:
-                    await message.answer(f"❌ Не удалось получить гороскоп. Попробуй позже.\nКод ошибки: {response.status}")
+                    await message.answer(f"❌ Не удалось получить гороскоп. Код ошибки: {response.status}")
         except asyncio.TimeoutError:
-            await message.answer("❌ API гороскопа не отвечает. Попробуй позже.")
+            await message.answer("❌ API не отвечает. Попробуй позже.")
         except Exception as e:
             await message.answer(f"❌ Ошибка: {e}")
 
