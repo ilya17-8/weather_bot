@@ -123,7 +123,7 @@ async def get_horoscope(message: types.Message):
     
     zodiac_en = zodiac_translate[zodiac_ru]
     
-    # Рабочий API гороскопа
+    # API гороскопа
     url = f"http://horoscope-api.herokuapp.com/horoscope/{zodiac_en}/today"
     
     async with aiohttp.ClientSession() as session:
@@ -131,13 +131,32 @@ async def get_horoscope(message: types.Message):
             async with session.get(url, timeout=10) as response:
                 if response.status == 200:
                     data = await response.json()
-                    # Пробуем разные форматы ответа
+                    
                     if "horoscope" in data:
-                        horoscope_text = data["horoscope"]
+                        horoscope_en = data["horoscope"]
                     elif "horoscope_data" in data:
-                        horoscope_text = data["horoscope_data"]
+                        horoscope_en = data["horoscope_data"]
                     else:
-                        horoscope_text = str(data)
+                        horoscope_en = str(data)
+                    
+                    # Перевод на русский через Google Translate API
+                    try:
+                        translate_url = "https://translate.googleapis.com/translate_a/single"
+                        params = {
+                            "client": "gtx",
+                            "sl": "en",
+                            "tl": "ru",
+                            "dt": "t",
+                            "q": horoscope_en
+                        }
+                        async with session.get(translate_url, params=params, timeout=10) as trans_response:
+                            if trans_response.status == 200:
+                                trans_data = await trans_response.json()
+                                horoscope_text = trans_data[0][0][0]
+                            else:
+                                horoscope_text = horoscope_en
+                    except:
+                        horoscope_text = horoscope_en
                     
                     await message.answer(f"🔮 Гороскоп для {zodiac_ru.capitalize()} на сегодня:\n\n{horoscope_text}")
                 else:
