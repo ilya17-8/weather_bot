@@ -123,21 +123,15 @@ async def get_horoscope(message: types.Message):
     
     zodiac_en = zodiac_translate[zodiac_ru]
     
-    # API гороскопа
-    url = f"http://horoscope-api.herokuapp.com/horoscope/{zodiac_en}/today"
+    # РАБОЧИЙ API (Aztro)
+    url = f"https://aztro.sameerkumar.website/?sign={zodiac_en}&day=today"
     
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get(url, timeout=10) as response:
+            async with session.post(url, timeout=10) as response:
                 if response.status == 200:
                     data = await response.json()
-                    
-                    if "horoscope" in data:
-                        horoscope_en = data["horoscope"]
-                    elif "horoscope_data" in data:
-                        horoscope_en = data["horoscope_data"]
-                    else:
-                        horoscope_en = str(data)
+                    horoscope_en = data.get("description", "Не удалось получить гороскоп")
                     
                     # Перевод на русский через Google Translate API
                     try:
