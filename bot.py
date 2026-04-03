@@ -123,17 +123,24 @@ async def get_horoscope(message: types.Message):
     
     zodiac_en = zodiac_translate[zodiac_ru]
     
-    # РАБОЧИЙ API (Aztro)
-    url = f"https://aztro.sameerkumar.website/?sign={zodiac_en}&day=today"
+    # СТАБИЛЬНЫЙ API гороскопа
+    url = f"https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign={zodiac_en}&day=today"
     
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(url, timeout=10) as response:
+            async with session.get(url, timeout=15) as response:
                 if response.status == 200:
                     data = await response.json()
-                    horoscope_en = data.get("description", "Не удалось получить гороскоп")
                     
-                    # Перевод на русский через Google Translate API
+                    # Получаем текст гороскопа из ответа
+                    if "data" in data and "horoscope" in data["data"]:
+                        horoscope_en = data["data"]["horoscope"]
+                    elif "horoscope" in data:
+                        horoscope_en = data["horoscope"]
+                    else:
+                        horoscope_en = str(data)
+                    
+                    # Перевод на русский через Google Translate
                     try:
                         translate_url = "https://translate.googleapis.com/translate_a/single"
                         params = {
@@ -141,7 +148,7 @@ async def get_horoscope(message: types.Message):
                             "sl": "en",
                             "tl": "ru",
                             "dt": "t",
-                            "q": horoscope_en
+                            "q": horoscope_en[:500]
                         }
                         async with session.get(translate_url, params=params, timeout=10) as trans_response:
                             if trans_response.status == 200:
@@ -154,7 +161,7 @@ async def get_horoscope(message: types.Message):
                     
                     await message.answer(f"🔮 Гороскоп для {zodiac_ru.capitalize()} на сегодня:\n\n{horoscope_text}")
                 else:
-                    await message.answer(f"❌ Не удалось получить гороскоп. API вернул код {response.status}")
+                    await message.answer(f"❌ Не удалось получить гороскоп. Попробуй позже.\nКод ошибки: {response.status}")
         except asyncio.TimeoutError:
             await message.answer("❌ API гороскопа не отвечает. Попробуй позже.")
         except Exception as e:
