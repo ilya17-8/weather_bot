@@ -10,6 +10,21 @@ WEATHER_API_KEY = "f91636e9cbe0555edad5ffa9e2680d15"
 
 user_cities = {}
 user_zodiac = {}
+# Словарь перевода (вставьте после импортов)
+zodiac_translate = {
+    "овен": "aries",
+    "телец": "taurus",
+    "близнецы": "gemini",
+    "рак": "cancer",
+    "лев": "leo",
+    "дева": "virgo",
+    "весы": "libra",
+    "скорпион": "scorpio",
+    "стрелец": "sagittarius",
+    "козерог": "capricorn",
+    "водолей": "aquarius",
+    "рыбы": "pisces"
+}
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -100,19 +115,30 @@ async def get_horoscope(message: types.Message):
         await message.answer("❌ Сначала установи знак зодиака командой /зодиак (название)\nПример: /зодиак рак")
         return
     
-    zodiac = user_zodiac[message.from_user.id].lower()  # приводим к нижнему регистру
+    zodiac_ru = user_zodiac[message.from_user.id].lower()
     
-    url = f"https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign={zodiac}&day=today"
+    # Проверяем, есть ли такой знак в словаре
+    if zodiac_ru not in zodiac_translate:
+        await message.answer("❌ Неизвестный знак. Доступные: овен, телец, близнецы, рак, лев, дева, весы, скорпион, стрелец, козерог, водолей, рыбы")
+        return
+    
+    zodiac_en = zodiac_translate[zodiac_ru]
+    
+    url = f"https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign={zodiac_en}&day=today"
     
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
+                    # Проверяем, есть ли ошибка в ответе
+                    if "error" in data:
+                        await message.answer(f"❌ Ошибка API: {data['error']}")
+                        return
                     horoscope_text = data["data"]["horoscope_data"]
-                    await message.answer(f"🔮 Гороскоп для {zodiac.capitalize()} на сегодня:\n\n{horoscope_text}")
+                    await message.answer(f"🔮 Гороскоп для {zodiac_ru.capitalize()} на сегодня:\n\n{horoscope_text}")
                 else:
-                    await message.answer("❌ Не удалось получить гороскоп. Попробуй позже.")
+                    await message.answer(f"❌ Не удалось получить гороскоп. Код ошибки: {response.status}")
         except Exception as e:
             await message.answer(f"❌ Ошибка: {e}")
 
