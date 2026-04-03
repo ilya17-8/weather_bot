@@ -135,7 +135,7 @@ async def get_horoscope(message: types.Message):
                     if "error" in data:
                         await message.answer(f"❌ Ошибка API: {data['error']}")
                         return
-                    horoscope_text = data["data"]["horoscope_data"]
+                    horoscope_text = data["data"]["horoscope"]
                     await message.answer(f"🔮 Гороскоп для {zodiac_ru.capitalize()} на сегодня:\n\n{horoscope_text}")
                 else:
                     await message.answer(f"❌ Не удалось получить гороскоп. Код ошибки: {response.status}")
